@@ -21,7 +21,6 @@ class CCamera : public CComponent
 		CAMTYPE_PLAYER,
 	};
 
-	int m_CamType;
 	vec2 m_aLastPos[NUM_DUMMIES];
 	vec2 m_PrevCenter;
 
@@ -38,6 +37,8 @@ class CCamera : public CComponent
 
 public:
 	static constexpr float ZOOM_STEP = 0.866025f;
+
+	int m_CamType;
 
 	vec2 m_Center;
 	bool m_ZoomSet;

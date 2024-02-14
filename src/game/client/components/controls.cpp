@@ -14,6 +14,7 @@
 #include <base/vmath.h>
 
 #include "controls.h"
+#include "game/generated/protocol.h"
 
 CControls::CControls()
 {
@@ -430,7 +431,9 @@ bool CControls::OnCursorMove(float x, float y, IInput::ECursorType CursorType)
 	if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_SpectatorID < 0)
 		Factor *= m_pClient->m_Camera.m_Zoom;
 
-	m_aMousePos[g_Config.m_ClDummy] += vec2(x, y) * Factor;
+	if((!m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Camera.m_CamType == 1) || m_pClient->m_Snap.m_SpecInfo.m_SpectatorID == SPEC_FREEVIEW)
+		m_aMousePos[g_Config.m_ClDummy] += vec2(x, y) * Factor;
+
 	ClampMousePos();
 	return true;
 }
