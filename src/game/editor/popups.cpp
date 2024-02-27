@@ -1368,7 +1368,20 @@ CUI::EPopupMenuFunctionResult CEditor::PopupEnvPoint(void *pContext, CUIRect Vie
 		Row.VSplitLeft(10.0f, nullptr, &EditBox);
 		pEditor->UI()->DoLabel(&Label, "Color:", RowHeight - 2.0f, TEXTALIGN_ML);
 
-		const auto SelectedPoint = pEditor->m_vSelectedEnvelopePoints.front();
+		std::pair<int, int> SelectedPoint;
+		if(pEditor->IsTangentInSelected())
+		{
+			SelectedPoint = pEditor->m_SelectedTangentInPoint;
+		}
+		else if(pEditor->IsTangentOutSelected())
+		{
+			SelectedPoint = pEditor->m_SelectedTangentOutPoint;
+		}
+		else
+		{
+			SelectedPoint = pEditor->m_vSelectedEnvelopePoints.front();
+		}
+
 		const int SelectedIndex = SelectedPoint.first;
 		auto *pValues = pEnvelope->m_vPoints[SelectedIndex].m_aValues;
 		const ColorRGBA Color = ColorRGBA(fx2f(pValues[0]), fx2f(pValues[1]), fx2f(pValues[2]), fx2f(pValues[3]));
