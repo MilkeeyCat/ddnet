@@ -90,7 +90,7 @@ jobs:
     - name: Prepare macOS
       if: contains(matrix.os, 'macOS')
       run: |
-        rm -rf /usr/local/bin/2to3
+        bew uninstall python3
         brew update || true
         brew install pkg-config sdl2 ffmpeg ninja molten-vk vulkan-headers glslang spirv-tools || true
         brew upgrade freetype
