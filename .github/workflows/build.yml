@@ -92,9 +92,9 @@ jobs:
       run: |
         brew update || true
         # --overwrite for:  Target /usr/local/bin/2to3 already exists.
-        echo python3 --version
+        python3 --version
         brew link --overwrite python@3.12
-        echo python3 --version
+        python3 --version
         brew install pkg-config sdl2 ffmpeg ninja molten-vk vulkan-headers glslang spirv-tools || true
         brew upgrade freetype
         pip3 install dmgbuild
