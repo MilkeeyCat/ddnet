@@ -91,11 +91,9 @@ jobs:
       if: contains(matrix.os, 'macOS')
       run: |
         brew update || true
-        # --overwrite for:  Target /usr/local/bin/2to3 already exists.
-        python3 --version
-        brew link --overwrite python@3.12
-        python3 --version
         brew install pkg-config sdl2 ffmpeg ninja molten-vk vulkan-headers glslang spirv-tools || true
+        # --overwrite for:  Target /usr/local/bin/2to3 already exists.
+        brew link --overwrite python@3.12
         brew upgrade freetype
         pip3 install dmgbuild
         echo /Library/Frameworks/Python.framework/Versions/3.11/bin >> $GITHUB_PATH
