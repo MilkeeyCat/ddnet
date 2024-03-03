@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest, ubuntu-20.04]
+        os: [ubuntu-latest, macOS-14, windows-latest, ubuntu-20.04]
         include:
         - os: ubuntu-latest
           cmake-args: -G Ninja
@@ -90,8 +90,6 @@ jobs:
     - name: Prepare macOS
       if: contains(matrix.os, 'macOS')
       run: |
-        brew unlink python3
-        brew link python3.12
         brew update || true
         brew install pkg-config sdl2 ffmpeg ninja molten-vk vulkan-headers glslang spirv-tools || true
         brew upgrade freetype
