@@ -90,7 +90,8 @@ jobs:
     - name: Prepare macOS
       if: contains(matrix.os, 'macOS')
       run: |
-        brew uninstall python3
+        brew unlink python3
+        brew link python3.12
         brew update || true
         brew install pkg-config sdl2 ffmpeg ninja molten-vk vulkan-headers glslang spirv-tools || true
         brew upgrade freetype
