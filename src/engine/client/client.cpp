@@ -2075,10 +2075,22 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket, int Conn, bool Dummy)
 					if(g_Config.m_DbgSnap)
 					{
 						if(IsSixup())
-							GameClient()->GetNetObjHandler7()->DebugDumpSnapshot(pTmpBuffer3);
+						{
+							unsigned char aDelta[] = {0x00, 0x0a, 0x00, 0x04, 0x99, 0x13, 0x90, 0x25, 0xb0, 0x0f, 0x01, 0x04, 0x9a, 0x13, 0xb0, 0x25, 0xb0, 0x0f, 0x00, 0x04, 0x9b, 0x13, 0xb0, 0x26, 0xb0, 0x0f, 0x02, 0x04, 0x9c, 0x13, 0xb0, 0x27, 0xb0, 0x0f, 0x03, 0x04, 0x9d, 0x13, 0xb0, 0x28, 0xb0, 0x0f, 0x04, 0x06, 0x00, 0x00, 0x01, 0x00, 0x0a, 0x00, 0x9f, 0x07, 0xb0, 0x1b, 0x91, 0x10, 0x00, 0x80, 0x02, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0xb0, 0x1b, 0x90, 0x10, 0x00, 0x00, 0x0a, 0x00, 0x0a, 0x01, 0x00, 0x00, 0x00, 0x0b, 0x00, 0x08, 0x00, 0x00, 0x15, 0x00, 0xb0, 0x1b, 0xae, 0x10, 0x27, 0x15, 0x01, 0xb0, 0x1b, 0xb1, 0x10, 0x27};
+							unsigned char aDecompressed[CSnapshot::MAX_SIZE];
+							int Size = CVariableInt::Decompress(aDelta, sizeof(aDelta), aDecompressed, sizeof(aDecompressed));
+							unsigned char aTmpBuffer[CSnapshot::MAX_SIZE];
+							CSnapshot *pTmpBuffer = (CSnapshot *)aTmpBuffer;
+							m_SnapshotDelta.UnpackDelta(CSnapshot::EmptySnapshot(), pTmpBuffer, aDecompressed, Size, IsSixup());
+
+							GameClient()->GetNetObjHandler7()->DebugDumpSnapshot(pTmpBuffer);
+						}
 						else
+						{
 							GameClient()->GetNetObjHandler()->DebugDumpSnapshot(pTmpBuffer3);
+						}
 					}
+					exit(0);
 
 					// add new
 					m_aSnapshotStorage[Conn].Add(GameTick, time_get(), SnapSize, pTmpBuffer3, AltSnapSize, pAltSnapBuffer);
@@ -4574,137 +4586,6 @@ int SDL_main(int argc, char *argv2[])
 int main(int argc, const char **argv)
 #endif
 {
-	CSnapshotBuilder Builder;
-	Builder.Init();
-
-	protocol7::CNetObj_Pickup Pickup;
-	void *pItem = Builder.NewItem(protocol7::CNetObj_Pickup::ms_MsgId, 1241, sizeof(Pickup));
-	Pickup.m_X = 2384;
-	Pickup.m_Y = 1008;
-	Pickup.m_Type = 1;
-	mem_copy(pItem, &Pickup, sizeof(Pickup));
-
-	pItem = Builder.NewItem(protocol7::CNetObj_Pickup::ms_MsgId, 1242, sizeof(Pickup));
-	Pickup.m_X = 2416;
-	Pickup.m_Y = 1008;
-	Pickup.m_Type = 0;
-	mem_copy(pItem, &Pickup, sizeof(Pickup));
-
-	pItem = Builder.NewItem(protocol7::CNetObj_Pickup::ms_MsgId, 1243, sizeof(Pickup));
-	Pickup.m_X = 2480;
-	Pickup.m_Y = 1008;
-	Pickup.m_Type = 2;
-	mem_copy(pItem, &Pickup, sizeof(Pickup));
-
-	pItem = Builder.NewItem(protocol7::CNetObj_Pickup::ms_MsgId, 1244, sizeof(Pickup));
-	Pickup.m_X = 2544;
-	Pickup.m_Y = 1008;
-	Pickup.m_Type = 3;
-	mem_copy(pItem, &Pickup, sizeof(Pickup));
-
-	pItem = Builder.NewItem(protocol7::CNetObj_Pickup::ms_MsgId, 1245, sizeof(Pickup));
-	Pickup.m_X = 2608;
-	Pickup.m_Y = 1008;
-	Pickup.m_Type = 4;
-	mem_copy(pItem, &Pickup, sizeof(Pickup));
-
-	protocol7::CNetObj_GameData GameData;
-	pItem = Builder.NewItem(protocol7::CNetObj_GameData::ms_MsgId, 0, sizeof(GameData));
-	GameData.m_GameStartTick = 0;
-	GameData.m_GameStateFlags = 1;
-	GameData.m_GameStateEndTick = 0;
-	mem_copy(pItem, &GameData, sizeof(GameData));
-
-	protocol7::CNetObj_Character Character;
-	pItem = Builder.NewItem(protocol7::CNetObj_Character::ms_MsgId, 0, sizeof(Character));
-	Character.m_Tick = 479;
-	Character.m_X = 1776;
-	Character.m_Y = 1041;
-	Character.m_VelX = 0;
-	Character.m_VelY = 128;
-	Character.m_Angle = 0;
-	Character.m_Direction = 0;
-	Character.m_Jumped = 0;
-	Character.m_HookedPlayer = -1;
-	Character.m_HookState = 0;
-	Character.m_HookTick = 0;
-	Character.m_HookX = 1776;
-	Character.m_HookY = 1040;
-	Character.m_HookDx = 0;
-	Character.m_HookDy = 0;
-	Character.m_Health = 10;
-	Character.m_Armor = 0;
-	Character.m_AmmoCount = 10;
-	Character.m_Weapon = 1;
-	Character.m_Emote = 0;
-	Character.m_AttackTick = 0;
-	Character.m_TriggeredEvents = 0;
-	mem_copy(pItem, &Character, sizeof(Character));
-
-	protocol7::CNetObj_PlayerInfo PlayerInfo;
-	pItem = Builder.NewItem(protocol7::CNetObj_PlayerInfo::ms_MsgId, 0, sizeof(PlayerInfo));
-	PlayerInfo.m_PlayerFlags = 8;
-	PlayerInfo.m_Score = 0;
-	PlayerInfo.m_Latency = 0;
-	mem_copy(pItem, &PlayerInfo, sizeof(PlayerInfo));
-
-	protocol7::CNetEvent_SoundWorld SoundWorld;
-	pItem = Builder.NewItem(protocol7::CNetEvent_SoundWorld::ms_MsgId, 0, sizeof(SoundWorld));
-	SoundWorld.m_X = 1776;
-	SoundWorld.m_Y = 1070;
-	// SoundWorld.m_Y = 1040;
-	SoundWorld.m_SoundId = 39;
-	mem_copy(pItem, &SoundWorld, sizeof(SoundWorld));
-
-	pItem = Builder.NewItem(protocol7::CNetEvent_SoundWorld::ms_MsgId, 1, sizeof(SoundWorld));
-	SoundWorld.m_X = 1776;
-	// SoundWorld.m_Y = 1041;
-	SoundWorld.m_Y = 1073;
-	SoundWorld.m_SoundId = 39;
-	mem_copy(pItem, &SoundWorld, sizeof(SoundWorld));
-
-	char aSnapshot[CSnapshot::MAX_SIZE];
-	CSnapshot *pSnapshot = (CSnapshot *)aSnapshot;
-	Builder.Finish(pSnapshot);
-
-	char aDelta[CSnapshot::MAX_SIZE];
-	CSnapshotDelta Delta;
-	protocol7::CNetObjHandler NetObjHandler;
-
-	for(int i = 0; i < NUM_NETOBJTYPES; i++)
-        Delta.SetStaticsize(i, NetObjHandler.GetObjSize(i));
-
-	Delta.SetStaticsize(protocol7::NETEVENTTYPE_SOUNDWORLD, 1);
-	Delta.SetStaticsize(protocol7::NETEVENTTYPE_DAMAGE, 1);
-
-	int DeltaSize = Delta.CreateDelta(CSnapshot::EmptySnapshot(), pSnapshot, aDelta);
-	char aCompressed[CSnapshot::MAX_SIZE];
-	int Size = CVariableInt::Compress(aDelta, DeltaSize, aCompressed, sizeof(aCompressed));
-
-	for(int Index = 0; Index < DeltaSize; Index++)
-	{
-		if(Index % 4 == 0 && Index != 0)
-			printf(" ");
-		printf("%02x ", aDelta[Index] & 0xff);
-	}
-
-	// =============================================
-
-	unsigned char aExpected[] = {0x00, 0x0a, 0x00, 0x04, 0x99, 0x13, 0x90, 0x25, 0xb0, 0x0f, 0x01, 0x04, 0x9a, 0x13, 0xb0, 0x25, 0xb0, 0x0f, 0x00, 0x04, 0x9b, 0x13, 0xb0, 0x26, 0xb0, 0x0f, 0x02, 0x04, 0x9c, 0x13, 0xb0, 0x27, 0xb0, 0x0f, 0x03, 0x04, 0x9d, 0x13, 0xb0, 0x28, 0xb0, 0x0f, 0x04, 0x06, 0x00, 0x00, 0x01, 0x00, 0x0a, 0x00, 0x9f, 0x07, 0xb0, 0x1b, 0x91, 0x10, 0x00, 0x80, 0x02, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0xb0, 0x1b, 0x90, 0x10, 0x00, 0x00, 0x0a, 0x00, 0x0a, 0x01, 0x00, 0x00, 0x00, 0x0b, 0x00, 0x08, 0x00, 0x00, 0x15, 0x00, 0xb0, 0x1b, 0xae, 0x10, 0x27, 0x15, 0x01, 0xb0, 0x1b, 0xb1, 0x10, 0x27};
-	char aDecompressed[CSnapshot::MAX_SIZE];
-
-	Size = CVariableInt::Decompress(aExpected, sizeof(aExpected), aDecompressed, sizeof(aDecompressed));
-
-	std::cout << "\nDecompressed expected:\n";
-	for(int Index = 0; Index < Size; Index++)
-	{
-		if(Index % 4 == 0 && Index != 0)
-			printf(" ");
-		printf("%02x ", aDecompressed[Index] & 0xff);
-	}
-
-	return 0;
-
 	const int64_t MainStart = time_get();
 
 #if defined(CONF_PLATFORM_ANDROID)
