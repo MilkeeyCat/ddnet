@@ -301,9 +301,6 @@ if(NOT MSVC AND NOT HAIKU)
   # special characters will be displayed incorrectly on servers.
   add_cxx_compiler_flag_if_supported(OUR_FLAGS -fsigned-char)
 
-  # Support more sections in object files, because the limit is exceeded for some files in debug mode.
-  add_cxx_compiler_flag_if_supported(OUR_FLAGS -Wa,-mbig-obj)
-
   # Don't insert timestamps into PEs to keep the build reproducible.
   if(TARGET_OS STREQUAL "windows")
     add_cxx_compiler_flag_if_supported(OUR_FLAGS_LINK -Wl,--no-insert-timestamp)
