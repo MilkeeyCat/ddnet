@@ -17,6 +17,7 @@
 #include <engine/shared/config.h>
 
 #include <SDL.h>
+#include <SDL_keyboard.h>
 
 // support older SDL version (pre 2.0.6)
 #ifndef SDL_JOYSTICK_AXIS_MIN
@@ -604,7 +605,7 @@ void CInput::SetCompositionWindowPosition(float X, float Y, float H)
 	SDL_SetTextInputRect(&Rect);
 }
 
-static int TranslateKeyEventKey(const SDL_KeyboardEvent &KeyEvent)
+static int TranslateKeyEventKey(const CInput &Input, const SDL_KeyboardEvent &KeyEvent)
 {
 	// See SDL_Keymod for possible modifiers:
 	// NONE   =     0
@@ -625,7 +626,16 @@ static int TranslateKeyEventKey(const SDL_KeyboardEvent &KeyEvent)
 		return KEY_UNKNOWN;
 	}
 
-	int Key = g_Config.m_InpTranslatedKeys ? SDL_GetScancodeFromKey(KeyEvent.keysym.sym) : KeyEvent.keysym.scancode;
+	int Key;
+	int Scancode;
+	if(g_Config.m_InpTranslatedKeys && (Scancode = Input.FindKeyByName(SDL_GetKeyName(KeyEvent.keysym.sym))) != EKey::KEY_UNKNOWN)
+	{
+		Key = Scancode;
+	}
+	else
+	{
+		Key = KeyEvent.keysym.scancode;
+	}
 
 #if defined(CONF_PLATFORM_ANDROID)
 	// Translate the Android back-button to the escape-key so it can be used to open/close the menu, close popups etc.
@@ -758,11 +768,11 @@ int CInput::Update()
 
 		// handle keys
 		case SDL_KEYDOWN:
-			AddKeyEventChecked(TranslateKeyEventKey(Event.key), IInput::FLAG_PRESS | (Event.key.repeat != 0 ? FLAG_REPEAT : 0));
+			AddKeyEventChecked(TranslateKeyEventKey(*this, Event.key), IInput::FLAG_PRESS | (Event.key.repeat != 0 ? FLAG_REPEAT : 0));
 			break;
 
 		case SDL_KEYUP:
-			AddKeyEventChecked(TranslateKeyEventKey(Event.key), IInput::FLAG_RELEASE);
+			AddKeyEventChecked(TranslateKeyEventKey(*this, Event.key), IInput::FLAG_RELEASE);
 			break;
 
 		// handle the joystick events
